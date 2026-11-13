@@ -1,0 +1,102 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #1c1c1d;
+  overscroll-behavior: none;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
+/* 筐体：skin.webp (1080x1920) を 9:16 のまま画面に収める */
+.device {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  height: min(100dvh, 100vw * 16 / 9);
+  background: url(skin.webp) center / 100% 100% no-repeat;
+  touch-action: none;
+  overflow: hidden;
+}
+
+/* 位置とサイズは emu.js が skin 上のピクセル座標から設定する */
+.screen, .dpad, .btn { position: absolute; display: block; }
+
+.screen {
+  background: #000;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  pointer-events: none;
+}
+
+/* ---- ボタン：skin の同じ場所を切り出して重ね、押下時に沈ませる ---- */
+.btn {
+  appearance: none;
+  border: 0;
+  outline: 0;
+  border-radius: 27%;
+  background-color: transparent;
+  background-image: url(skin.webp);
+  background-repeat: no-repeat;
+  cursor: pointer;
+  touch-action: none;
+  z-index: 2;
+  transition: transform .09s ease-out, filter .09s ease-out;
+}
+.btn.down {
+  transform: scale(.955);
+  filter: brightness(.8);
+  transition-duration: .03s;
+}
+
+/* ---- 十字パッド ---- */
+.dpad {
+  z-index: 1;
+  cursor: grab;
+  touch-action: none;
+  /* 十字の形だけがタッチに反応する */
+  clip-path: polygon(
+    37.8% 0, 61.8% 0, 61.8% 37.4%, 100% 37.4%, 100% 60.6%, 61.8% 60.6%,
+    61.8% 100%, 37.8% 100%, 37.8% 60.6%, 0 60.6%, 0 37.4%, 37.8% 37.4%);
+}
+.dpad.scrolling { cursor: grabbing; }
+
+.arm {
+  position: absolute;
+  opacity: 0;
+  transition: opacity .12s ease-out;
+  pointer-events: none;
+}
+.arm.on { opacity: 1; transition-duration: .02s; }
+.arm.up    { left: 37.8%; width: 24%; top: 0;    height: 40%; border-radius: 45% 45% 0 0 / 28% 28% 0 0;
+             background: linear-gradient(to bottom, rgba(0,0,0,.5), rgba(0,0,0,0)); }
+.arm.down  { left: 37.8%; width: 24%; bottom: 0; height: 40%; border-radius: 0 0 45% 45% / 0 0 28% 28%;
+             background: linear-gradient(to top, rgba(0,0,0,.5), rgba(0,0,0,0)); }
+.arm.left  { top: 37.4%; height: 23.2%; left: 0;  width: 40%; border-radius: 28% 0 0 28% / 45% 0 0 45%;
+             background: linear-gradient(to right, rgba(0,0,0,.5), rgba(0,0,0,0)); }
+.arm.right { top: 37.4%; height: 23.2%; right: 0; width: 40%; border-radius: 0 28% 28% 0 / 0 45% 45% 0;
+             background: linear-gradient(to left, rgba(0,0,0,.5), rgba(0,0,0,0)); }
+
+/* スクロール中の指位置 */
+.finger {
+  position: absolute;
+  width: 17%;
+  aspect-ratio: 1;
+  margin: -8.5% 0 0 -8.5%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,0) 70%);
+  opacity: 0;
+  transition: opacity .15s;
+  pointer-events: none;
+}
+.dpad.scrolling .finger { opacity: 1; }
